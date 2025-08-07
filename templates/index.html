@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Analytics | AI</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a73e8'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z'/%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8eaed 100%);
+            color: #202124;
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(218, 220, 224, 0.3);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 20px rgba(60, 64, 67, 0.1);
+            z-index: 1000;
+            position: relative;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 500;
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .nav-brand .material-icons {
+            font-size: 24px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #5f6368;
+            background: transparent;
+            border: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .nav-tab.active {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: rgba(26, 115, 232, 0.1);
+            color: #1a73e8;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .examples-dropdown {
+            position: relative;
+        }
+
+        .examples-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(26, 115, 232, 0.1);
+            border: 1px solid rgba(26, 115, 232, 0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #1a73e8;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .examples-toggle:hover {
+            background: rgba(26, 115, 232, 0.2);
+        }
+
+        .examples-toggle .material-icons {
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .examples-toggle.open .material-icons {
+            transform: rotate(180deg);
+        }
+
+        .examples-dropdown-content {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(60, 64, 67, 0.2);
+            border: 1px solid rgba(218, 220, 224, 0.3);
+            min-width: 320px;
+            max-width: 400px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.3s ease;
+        }
+
+        .examples-dropdown-content.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .examples-dropdown-header {
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid rgba(218, 220, 224, 0.3);
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .examples-dropdown-header h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+            margin: 0;
+        }
+
+        .examples-dropdown-list {
+            padding: 8px;
+        }
+
+        .dropdown-example-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            color: #3c4043;
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .dropdown-example-item:hover {
+            background: rgba(26, 115, 232, 0.1);
+            color: #1a73e8;
+        }
+
+        .dropdown-example-item .material-icons {
+            font-size: 16px;
+            margin-top: 1px;
+            opacity: 0.6;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(52, 168, 83, 0.1);
+            color: #34a853;
+        }
+
+        .status-indicator.processing {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ff8f00;
+        }
+
+        .status-indicator.error {
+            background: rgba(234, 67, 53, 0.1);
+            color: #ea4335;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(218, 220, 224, 0.3);
+            padding: 24px;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(60, 64, 67, 0.1);
+        }
+
+        .search-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            color: #202124;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235f6368' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .form-select:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 80px;
+            max-height: 160px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .search-input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #9aa0a6;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .button-row .btn {
+            flex: 1;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            background: rgba(255, 255, 255, 0.9);
+            color: #3c4043;
+            border-radius: 8px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
+        .btn.primary {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            background: #1557b0;
+        }
+
+        .btn.danger {
+            background: #ea4335;
+            color: white;
+            border-color: #ea4335;
+        }
+
+        .btn.danger:hover:not(:disabled) {
+            background: #d33b2c;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .examples-section {
+            border-top: 1px solid rgba(218, 220, 224, 0.3);
+            padding-top: 24px;
+        }
+
+        .example-item {
+            padding: 12px;
+            background: rgba(248, 249, 250, 0.8);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            color: #3c4043;
+            border: 1px solid transparent;
+        }
+
+        .example-item:hover {
+            background: rgba(26, 115, 232, 0.1);
+            border-color: rgba(26, 115, 232, 0.3);
+        }
+
+        .advanced-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(218, 220, 224, 0.3);
+        }
+
+        .sql-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            border-radius: 8px;
+            font-family: 'Roboto Mono', 'Roboto', monospace;
+            font-size: 12px;
+            min-height: 60px;
+            resize: vertical;
+            outline: none;
+            transition: all 0.3s ease;
+            background: rgba(248, 249, 250, 0.9);
+        }
+
+        .sql-input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+        }
+
+        /* Results Area */
+        .results-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .results-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid rgba(218, 220, 224, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .results-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .results-meta {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+            color: #5f6368;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .results-content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #5f6368;
+            text-align: center;
+        }
+
+        .empty-state .material-icons {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: #3c4043;
+        }
+
+        .empty-state p {
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            max-width: 400px;
+        }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex-direction: column;
+            color: #5f6368;
+        }
+
+        .spinner {
+            border: 3px solid rgba(26, 115, 232, 0.1);
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(26, 115, 232, 0.1);
+            border-radius: 1px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1a73e8;
+            border-radius: 1px;
+            animation: progress 2s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; transform: translateX(-100%); }
+            50% { width: 100%; transform: translateX(0%); }
+            100% { width: 100%; transform: translateX(100%); }
+        }
+
+        .error-state {
+            background: rgba(234, 67, 53, 0.1);
+            border: 1px solid rgba(234, 67, 53, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            color: #ea4335;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .success-state {
+            background: rgba(52, 168, 83, 0.1);
+            border: 1px solid rgba(52, 168, 83, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            color: #34a853;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .response-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(60, 64, 67, 0.1);
+            border: 1px solid rgba(218, 220, 224, 0.3);
+        }
+
+        .response-text {
+            white-space: normal;
+            line-height: 1.6;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            color: #202124;
+        }
+
+        .response-text h1, .response-text h2, .response-text h3 {
+            color: #202124;
+            margin: 16px 0 8px 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .response-text h1 { font-size: 18px; font-weight: 500; }
+        .response-text h2 { font-size: 16px; font-weight: 500; }
+        .response-text h3 { font-size: 15px; font-weight: 500; }
+
+        .response-text p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .response-text ul, .response-text ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .response-text li {
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        .response-text code {
+            background: rgba(248, 249, 250, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            color: #ea4335;
+        }
+
+        .response-text pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 12px 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            line-height: 1.3;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+        }
+
+        .response-text blockquote {
+            border-left: 3px solid #1a73e8;
+            margin: 12px 0;
+            padding: 8px 16px;
+            background: rgba(26, 115, 232, 0.05);
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
+        }
+
+        .response-text strong {
+            font-weight: 500;
+            color: #202124;
+        }
+
+        .response-text em {
+            font-style: italic;
+            color: #5f6368;
+        }
+
+        .analysis-section {
+            margin: 12px 0;
+            padding: 0;
+        }
+
+        .analysis-point {
+            margin: 6px 0;
+            padding: 0;
+            line-height: 1.4;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(218, 220, 224, 0.6);
+            color: #3c4043;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(218, 220, 224, 0.3);
+            color: #202124;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .data-table tr:hover {
+            background: rgba(248, 249, 250, 0.8);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .results-content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                display: none;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 64px;
+                height: calc(100vh - 64px);
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .results-area {
+                width: 100%;
+            }
+
+            .nav-left {
+                gap: 12px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(95, 99, 104, 0.3);
+            border-radius: 3px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(60, 64, 67, 0.1);
+            border: 1px solid rgba(218, 220, 224, 0.3);
+        }
+
+        .chart-title {
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #5f6368;
+            border: 2px dashed #dadce0;
+        }
+
+        .chart-placeholder .material-icons {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+
+        .chart-summary {
+            background: rgba(26, 115, 232, 0.1);
+            border: 1px solid rgba(26, 115, 232, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .chart-summary h3 {
+            color: #1a73e8;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .chart-summary p {
+            color: #3c4043;
+            font-size: 13px;
+            margin: 4px 0;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 8px;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, #1a73e8, #4285f4);
+            border-radius: 4px 4px 0 0;
+            min-height: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .bar:hover {
+            background: linear-gradient(to top, #1557b0, #1a73e8);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #5f6368;
+            width: 100px;
+            text-align: center;
+            word-wrap: break-word;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #202124;
+            font-weight: 500;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .bar:hover .bar-value {
+            opacity: 1;
+        }
+
+        .trend-line {
+            height: 200px;
+            background: #fafafa;
+            border-radius: 8px;
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .trend-up { color: #34a853; }
+        .trend-down { color: #ea4335; }
+        .trend-stable { color: #fbbc04; }
+
+        /* Enhanced Response Formatting Styles */
+        .highlight-text {
+            color: #1a73e8;
+            font-weight: 600;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 24px 0 16px 0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .section-header.level-1 {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            font-size: 20px;
+        }
+        
+        .section-header.level-2 {
+            background: rgba(26, 115, 232, 0.1);
+            color: #1a73e8;
+            border-left: 4px solid #1a73e8;
+            font-size: 18px;
+        }
+        
+        .section-header.level-3 {
+            background: rgba(52, 168, 83, 0.1);
+            color: #34a853;
+            border-left: 4px solid #34a853;
+            font-size: 16px;
+        }
+        
+        .code-block {
+            margin: 16px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+        }
+        
+        .code-header {
+            background: #f8f9fa;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f6368;
+            border-bottom: 1px solid rgba(218, 220, 224, 0.6);
+        }
+        
+        .sql-block .code-header {
+            background: rgba(26, 115, 232, 0.1);
+            color: #1a73e8;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            background: white;
+            padding: 16px;
+        }
+        
+        .inline-code {
+            background: rgba(26, 115, 232, 0.1);
+            color: #1a73e8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .formatted-list {
+            margin: 12px 0;
+            padding-left: 0;
+        }
+        
+        .formatted-list.insights {
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .formatted-list.recommendations {
+            background: rgba(52, 168, 83, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .formatted-list.summary {
+            background: rgba(26, 115, 232, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .list-item:hover {
+            background: rgba(248, 249, 250, 0.8);
+        }
+        
+        .list-icon {
+            font-size: 16px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        
+        .insights .list-icon {
+            color: #fbbc04;
+        }
+        
+        .recommendations .list-icon {
+            color: #34a853;
+        }
+        
+        .paragraph.summary {
+            background: rgba(26, 115, 232, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #1a73e8;
+        }
+        
+        .paragraph.insights {
+            background: rgba(255, 193, 7, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #fbbc04;
+        }
+        
+        .paragraph.recommendations {
+            background: rgba(52, 168, 83, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #34a853;
+        }
+        
+        .chart-suggestions {
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(66, 133, 244, 0.1));
+            border: 1px solid rgba(26, 115, 232, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .chart-suggestions h3 {
+            color: #1a73e8;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+        
+        .suggestion-card {
+            background: white;
+            border: 1px solid rgba(218, 220, 224, 0.6);
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .suggestion-card:hover {
+            border-color: #1a73e8;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .suggestion-title {
+            font-weight: 500;
+            color: #202124;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-description {
+            font-size: 12px;
+            color: #5f6368;
+            margin-bottom: 8px;
+        }
+        
+        .suggestion-details {
+            font-size: 11px;
+            color: #1a73e8;
+            background: rgba(26, 115, 232, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-left">
+                <a href="/" class="nav-brand">
+                    <span class="material-icons">analytics</span>
+                    TV Analytics
+                </a>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</button>
+                    <button class="nav-tab" onclick="switchTab('charts')">Charts</button>
+                    <button class="nav-tab" onclick="switchTab('settings')">Settings</button>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="examples-dropdown">
+                    <button class="examples-toggle" onclick="toggleExamples()">
+                        <span class="material-icons">help_outline</span>
+                        Examples
+                        <span class="material-icons">expand_more</span>
+                    </button>
+                    <div class="examples-dropdown-content" id="examplesDropdown">
+                        <div class="examples-dropdown-header">
+                            <h3>Example Questions</h3>
+                        </div>
+                        <div class="examples-dropdown-list" id="navExamplesList">
+                            <!-- Examples will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="status-indicator" id="statusIndicator">
+                    <div class="status-dot"></div>
+                    <span id="statusText">Ready</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <!-- Search Section -->
+                <div class="search-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">search</span>
+                        Query Assistant
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="modelSelect">AI Model</label>
+                        <select id="modelSelect" class="form-select">
+                            <option value="snowflake-arctic">Snowflake Arctic</option>
+                            <option value="llama3-8b">Llama3 8B</option>
+                            <option value="claude-4-sonnet">Claude 4 Sonnet</option>
+                            <option value="mistral-large">Mistral Large</option>
+                            <option value="deepseek-r1">Deepseek R1</option>
+                            <option value="openai-gpt-4.1">OpenAI GPT-4.1</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="temperatureSlider">Temperature (Creativity)</label>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <input type="range" id="temperatureSlider" min="0" max="1" step="0.1" value="0.7" 
+                                   style="flex: 1; height: 6px; background: #ddd; outline: none; border-radius: 3px;">
+                            <span id="temperatureValue" style="font-size: 12px; color: #5f6368; min-width: 30px;">0.7</span>
+                        </div>
+                        <div style="font-size: 11px; color: #9aa0a6; margin-top: 4px;">
+                            Lower = More focused • Higher = More creative
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="questionInput">Your Question</label>
+                        <textarea id="questionInput" class="search-input" 
+                                  placeholder="What insights would you like about your TV ratings data?"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <div class="button-row">
+                            <button class="btn primary" id="analyzeBtn" onclick="submitQuestion()">
+                                <span class="material-icons">auto_awesome</span>
+                                Analyze Data
+                            </button>
+                            <button class="btn" onclick="clearResults()">
+                                <span class="material-icons">refresh</span>
+                                Clear Results
+                            </button>
+                            <button class="btn danger" id="cancelBtn" onclick="cancelRequest()" style="display: none;">
+                                <span class="material-icons">close</span>
+                                Cancel Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Examples Section -->
+                <!-- <div class="examples-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">quiz</span>
+                        Quick Examples
+                    </h3>
+                    <div id="examplesList">
+                        <div class="example-item" onclick="loadSampleQuestions()">
+                            Click "Examples" in navbar for more options
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- Advanced SQL Section -->
+                <div class="advanced-section">
+                    <h3 class="section-title">
+                        <span class="material-icons">code</span>
+                        Advanced Query
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="sqlInput">SQL Query</label>
+                        <textarea id="sqlInput" class="sql-input" 
+                                  placeholder="SELECT * FROM dev_dwdb.analytics.tv_show_ratings LIMIT 10;"
+                                  rows="3"></textarea>
+                    </div>
+                    
+                    <button class="btn" id="sqlBtn" onclick="executeSql()">
+                        <span class="material-icons">play_arrow</span>
+                        Execute SQL
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Results Area -->
+            <main class="results-area" id="resultsArea">
+                <div class="results-header">
+                    <h2 class="results-title" id="resultsTitle">Analysis Results</h2>
+                    <div class="results-meta" id="resultsMetadata"></div>
+                </div>
+                <div class="results-content" id="resultsContent">
+                    <div class="empty-state">
+                        <span class="material-icons">psychology</span>
+                        <h3>Ready to analyze your data</h3>
+                        <p>Ask a question about your TV ratings data using natural language, or execute a custom SQL query to get started.</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Charts Area -->
+            <main class="results-area" id="chartsArea" style="display: none;">
+                <div class="results-header">
+                    <h2 class="results-title">Data Visualizations</h2>
+                    <div class="results-meta" id="chartsMetadata">
+                        <button class="btn" onclick="refreshCharts()" id="refreshChartsBtn" style="display: none;">
+                            <span class="material-icons">refresh</span>
+                            Refresh Charts
+                        </button>
+                    </div>
+                </div>
+                <div class="results-content" id="chartsContent">
+                    <div class="empty-state">
+                        <span class="material-icons">insert_chart</span>
+                        <h3>Charts will appear automatically</h3>
+                        <p>Ask a question in the Dashboard tab and charts will be generated automatically based on your query and results.</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Settings Area -->
+            <main class="results-area" id="settingsArea" style="display: none;">
+                <div class="results-header">
+                    <h2 class="results-title">Settings</h2>
+                    <div class="results-meta"></div>
+                </div>
+                <div class="results-content" id="settingsContent">
+                    <div class="response-content">
+                        <h3>Application Settings</h3>
+                        <div class="form-group">
+                            <label class="form-label">Default Model</label>
+                            <select class="form-select" id="defaultModel">
+                                <option value="snowflake-arctic">Snowflake Arctic</option>
+                                <option value="llama3-8b">Llama3 8B</option>
+                                <option value="llama3-70b">Llama3 70B</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Theme</label>
+                            <select class="form-select">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark (Coming Soon)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Auto-save Queries</label>
+                            <select class="form-select">
+                                <option value="true">Enabled</option>
+                                <option value="false">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let isProcessing = false;
+        let currentRequest = null;
+        let requestController = null;
+
+        // Auto-resize textarea
+        document.getElementById('questionInput').addEventListener('input', autoResizeTextarea);
+        document.getElementById('sqlInput').addEventListener('input', autoResizeTextarea);
+        
+        // Temperature slider update
+        document.getElementById('temperatureSlider').addEventListener('input', function(e) {
+            document.getElementById('temperatureValue').textContent = e.target.value;
+        });
+
+        function autoResizeTextarea(e) {
+            const textarea = e.target;
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 160) + 'px';
+        }
+
+        // Load sample questions on page load
+        window.onload = function() {
+            loadSampleQuestions();
+            updateStatus('ready', 'Ready');
+        };
+
+        function updateStatus(type, message) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            
+            indicator.className = 'status-indicator';
+            if (type === 'processing') {
+                indicator.classList.add('processing');
+            } else if (type === 'error') {
+                indicator.classList.add('error');
+            }
+            
+            text.textContent = message;
+        }
+
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const sqlBtn = document.getElementById('sqlBtn');
+            const modelSelect = document.getElementById('modelSelect');
+            
+            if (processing) {
+                analyzeBtn.style.display = 'none';
+                cancelBtn.style.display = 'flex';
+                sqlBtn.disabled = true;
+                modelSelect.disabled = true;
+                updateStatus('processing', 'Processing...');
+            } else {
+                analyzeBtn.style.display = 'flex';
+                cancelBtn.style.display = 'none';
+                sqlBtn.disabled = false;
+                modelSelect.disabled = false;
+                updateStatus('ready', 'Ready');
+            }
+        }
+
+        function cancelRequest() {
+            if (requestController) {
+                requestController.abort();
+                requestController = null;
+            }
+            setProcessingState(false);
+            updateStatus('ready', 'Request cancelled');
+        }
+
+        async function loadSampleQuestions() {
+            try {
+                const response = await fetch('/api/sample-questions');
+                const data = await response.json();
+                
+                // Load examples in navbar dropdown
+                const navExamplesList = document.getElementById('navExamplesList');
+                navExamplesList.innerHTML = '';
+                
+                data.questions.forEach(question => {
+                    const div = document.createElement('div');
+                    div.className = 'dropdown-example-item';
+                    div.innerHTML = `
+                        <span class="material-icons">lightbulb_outline</span>
+                        <span>${question}</span>
+                    `;
+                    div.onclick = () => {
+                        if (!isProcessing) {
+                            document.getElementById('questionInput').value = question;
+                            autoResizeTextarea({target: document.getElementById('questionInput')});
+                            closeExamples();
+                        }
+                    };
+                    navExamplesList.appendChild(div);
+                });
+                
+                // Keep a simple placeholder in sidebar
+                const examplesList = document.getElementById('examplesList');
+                examplesList.innerHTML = `
+                    <div class="example-item" onclick="document.querySelector('.examples-toggle').click()">
+                        <span class="material-icons" style="font-size: 16px; margin-right: 8px;">arrow_upward</span>
+                        View examples in navbar above
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading sample questions:', error);
+            }
+        }
+
+        function toggleExamples() {
+            const dropdown = document.getElementById('examplesDropdown');
+            const toggle = document.querySelector('.examples-toggle');
+            
+            const isOpen = dropdown.classList.contains('show');
+            
+            if (isOpen) {
+                closeExamples();
+            } else {
+                dropdown.classList.add('show');
+                toggle.classList.add('open');
+                
+                // Close when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', closeExamplesOnOutsideClick);
+                }, 100);
+            }
+        }
+
+        function closeExamples() {
+            const dropdown = document.getElementById('examplesDropdown');
+            const toggle = document.querySelector('.examples-toggle');
+            
+            dropdown.classList.remove('show');
+            toggle.classList.remove('open');
+            document.removeEventListener('click', closeExamplesOnOutsideClick);
+        }
+
+        function closeExamplesOnOutsideClick(e) {
+            const dropdown = document.querySelector('.examples-dropdown');
+            if (!dropdown.contains(e.target)) {
+                closeExamples();
+            }
+        }
+
+        async function submitQuestion() {
+            if (isProcessing) return;
+            
+            const question = document.getElementById('questionInput').value.trim();
+            const model = document.getElementById('modelSelect').value;
+            const temperature = parseFloat(document.getElementById('temperatureSlider').value);
+            
+            if (!question) {
+                document.getElementById('questionInput').focus();
+                return;
+            }
+            
+            // Store current question for chart generation
+            currentQuestion = question;
+            generatedCharts = false;
+            
+            setProcessingState(true);
+            showLoadingState();
+            
+            try {
+                requestController = new AbortController();
+                
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        model: model,
+                        temperature: temperature
+                    }),
+                    signal: requestController.signal
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data, 'ai');
+                    updateStatus('ready', 'Analysis complete');
+                    
+                    // Auto-generate charts if data is available
+                    if (data.data) {
+                        setTimeout(() => {
+                            generateChartsAutomatically(question, data);
+                        }, 500);
+                    }
+                } else {
+                    displayError(data.error);
+                    updateStatus('error', 'Analysis failed');
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Request was cancelled');
+                } else {
+                    displayError(`Network error: ${error.message}`);
+                    updateStatus('error', 'Network error');
+                }
+            } finally {
+                setProcessingState(false);
+                requestController = null;
+            }
+        }
+
+        async function executeSql() {
+            if (isProcessing) return;
+            
+            const sqlQuery = document.getElementById('sqlInput').value.trim();
+            
+            if (!sqlQuery) {
+                document.getElementById('sqlInput').focus();
+                return;
+            }
+            
+            // Store a generic question for SQL queries
+            currentQuestion = `SQL Query: ${sqlQuery.substring(0, 50)}${sqlQuery.length > 50 ? '...' : ''}`;
+            generatedCharts = false;
+            
+            setProcessingState(true);
+            showLoadingState();
+            
+            try {
+                requestController = new AbortController();
+                
+                const response = await fetch('/api/direct-sql', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: sqlQuery
+                    }),
+                    signal: requestController.signal
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data, 'sql');
+                    updateStatus('ready', 'Query executed');
+                    
+                    // Auto-generate charts for SQL results
+                    setTimeout(() => {
+                        generateChartsAutomatically(currentQuestion, data);
+                    }, 500);
+                } else {
+                    displayError(data.error);
+                    updateStatus('error', 'Query failed');
+                }
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('Request was cancelled');
+                } else {
+                    displayError(`Network error: ${error.message}`);
+                    updateStatus('error', 'Network error');
+                }
+            } finally {
+                setProcessingState(false);
+                requestController = null;
+            }
+        }
+
+        function showLoadingState() {
+            const resultsContent = document.getElementById('resultsContent');
+            resultsContent.innerHTML = `
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <p>Analyzing your request...</p>
+                </div>
+            `;
+        }
+
+        function displayResults(data, type) {
+            const resultsContent = document.getElementById('resultsContent');
+            const metadata = document.getElementById('resultsMetadata');
+            
+            let content = '';
+            
+            if (type === 'ai') {
+                const timestamp = new Date(data.timestamp).toLocaleString();
+                metadata.innerHTML = `
+                    <span>Model: ${data.model_used}</span>
+                    <span>•</span>
+                    <span>${timestamp}</span>
+                `;
+                                
+                // Format the response text for better readability
+                const formattedResponse = formatAIResponse(data.response);
+                content += `<div class="response-content">
+                    <div class="response-text">${formattedResponse}</div>
+                </div>`;
+                
+                if (data.data) {
+                    content += generateDataTable(data.data);
+                    lastQueryData = data.data; // Store for charts
+                }
+            } else if (type === 'sql') {
+                const timestamp = new Date().toLocaleString();
+                metadata.innerHTML = `
+                    <span>Direct SQL Query</span>
+                    <span>•</span>
+                    <span>${data.row_count} rows</span>
+                    <span>•</span>
+                    <span>${timestamp}</span>
+                `;
+                
+                content += `<div class="success-state">
+                    <span class="material-icons">check_circle</span>
+                    Query executed
+                </div>`;
+                
+                content += generateDataTable(data);
+                lastQueryData = data; // Store for charts
+            }
+            
+            resultsContent.innerHTML = content;
+        }
+
+        function formatAIResponse(text) {
+            // Clean up excessive spacing and normalize text
+            let formatted = text
+                .replace(/\n\s*\n\s*\n/g, '\n\n') // Reduce multiple line breaks to double
+                .replace(/^\s+|\s+$/g, '') // Trim whitespace
+                .trim();
+
+            // Convert markdown-like formatting to HTML with enhanced styling
+            formatted = formatted
+                // Bold text
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="highlight-text">$1</strong>')
+                // Simple headers without enhanced styling
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                // Enhanced code blocks with syntax highlighting hints
+                .replace(/```sql\n([\s\S]*?)\n```/g, '<div class="code-block sql-block"><div class="code-header"><span class="material-icons">code</span>SQL Query</div><pre><code class="sql">$1</code></pre></div>')
+                .replace(/```(\w+)?\n([\s\S]*?)\n```/g, '<div class="code-block"><div class="code-header"><span class="material-icons">code</span>Code</div><pre><code>$2</code></pre></div>')
+                // Inline code with better styling
+                .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+            // Handle numbered lists and bullet points with enhanced styling
+            const lines = formatted.split('\n');
+            let htmlLines = [];
+            let inOrderedList = false;
+            let inUnorderedList = false;
+            let currentSection = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                // Detect section types for better formatting
+                if (line.includes('Executive Summary') || line.includes('Key Insights') || line.includes('Recommendations')) {
+                    currentSection = line.toLowerCase().includes('executive') ? 'summary' : 
+                                   line.toLowerCase().includes('insights') ? 'insights' : 'recommendations';
+                }
+                
+                if (/^\d+\.\s+/.test(line)) {
+                    // Numbered list item
+                    if (!inOrderedList) {
+                        if (inUnorderedList) {
+                            htmlLines.push('</ul>');
+                            inUnorderedList = false;
+                        }
+                        htmlLines.push(`<ol class="formatted-list ${currentSection || ''}">`);
+                        inOrderedList = true;
+                    }
+                    const content = line.replace(/^\d+\.\s+/, '');
+                    htmlLines.push(`<li class="list-item">${content}</li>`);
+                } else if (/^[\*\-]\s+/.test(line)) {
+                    // Bulleted list item with icons
+                    if (!inUnorderedList) {
+                        if (inOrderedList) {
+                            htmlLines.push('</ol>');
+                            inOrderedList = false;
+                        }
+                        htmlLines.push(`<ul class="formatted-list bullet-list ${currentSection || ''}">`);
+                        inUnorderedList = true;
+                    }
+                    const content = line.replace(/^[\*\-]\s+/, '');
+                    const icon = currentSection === 'insights' ? 'lightbulb' : 
+                               currentSection === 'recommendations' ? 'recommend' : 'fiber_manual_record';
+                    htmlLines.push(`<li class="list-item"><span class="material-icons list-icon">${icon}</span>${content}</li>`);
+                } else {
+                    // Regular line or empty line
+                    if (inOrderedList) {
+                        htmlLines.push('</ol>');
+                        inOrderedList = false;
+                    }
+                    if (inUnorderedList) {
+                        htmlLines.push('</ul>');
+                        inUnorderedList = false;
+                    }
+                    
+                    if (line.trim() === '') {
+                        htmlLines.push('');
+                        currentSection = null; // Reset section context
+                    } else if (!line.startsWith('<h') && !line.startsWith('<pre') && !line.startsWith('<div')) {
+                        const paragraphClass = currentSection ? `paragraph ${currentSection}` : 'paragraph';
+                        htmlLines.push(`<p class="${paragraphClass}">${line}</p>`);
+                    } else {
+                        htmlLines.push(line);
+                    }
+                }
+            }
+            
+            // Close any open lists
+            if (inOrderedList) htmlLines.push('</ol>');
+            if (inUnorderedList) htmlLines.push('</ul>');
+            
+            return htmlLines.join('\n');
+        }
+
+        function switchTab(tabName) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show corresponding content area
+            document.getElementById('resultsArea').style.display = tabName === 'dashboard' ? 'flex' : 'none';
+            document.getElementById('chartsArea').style.display = tabName === 'charts' ? 'flex' : 'none';
+            document.getElementById('settingsArea').style.display = tabName === 'settings' ? 'flex' : 'none';
+        }
+
+        let lastQueryData = null;
+        let currentQuestion = '';
+        let generatedCharts = false;
+
+        function analyzeQuestionForCharts(question) {
+            const q = question.toLowerCase();
+            const chartTypes = [];
+            
+            if (q.includes('trend') || q.includes('over time') || q.includes('change') || q.includes('growth')) {
+                chartTypes.push('trend');
+            }
+            if (q.includes('top') || q.includes('best') || q.includes('highest') || q.includes('compare')) {
+                chartTypes.push('ranking');
+            }
+            if (q.includes('network') && (q.includes('vs') || q.includes('versus') || q.includes('compare'))) {
+                chartTypes.push('comparison');
+            }
+            if (q.includes('average') || q.includes('mean') || q.includes('performance')) {
+                chartTypes.push('performance');
+            }
+            if (q.includes('share') || q.includes('percentage') || q.includes('market')) {
+                chartTypes.push('distribution');
+            }
+            
+            return chartTypes.length > 0 ? chartTypes : ['overview'];
+        }
+
+        function generateChartsAutomatically(question, data) {
+            if (!data || (!data.columns && !data.data)) return;
+            
+            const chartsContent = document.getElementById('chartsContent');
+            const chartsMetadata = document.getElementById('chartsMetadata');
+            
+            chartsMetadata.innerHTML = `
+                <span>Charts for: "${question.substring(0, 40)}${question.length > 40 ? '...' : ''}"</span>
+            `;
+            
+            let chartsHTML = '';
+            
+            // Get data structure
+            const dataToUse = data.data || data;
+            const columns = dataToUse.columns || data.columns;
+            const rows = dataToUse.rows || data.rows;
+            
+            if (columns && rows) {
+                // Use AI suggestions if available, otherwise generate smart charts
+                if (data.chart_suggestions && data.chart_suggestions.length > 0) {
+                    data.chart_suggestions.forEach(suggestion => {
+                        chartsHTML += generateActualChart(suggestion, columns, rows);
+                    });
+                } else {
+                    // Generate smart chart based on data
+                    chartsHTML += generateSmartChart(columns, rows, question);
+                }
+            }
+            
+            chartsContent.innerHTML = chartsHTML || `
+                <div class="empty-state">
+                    <span class="material-icons">insert_chart</span>
+                    <h3>No data to visualize</h3>
+                </div>
+            `;
+            
+            generatedCharts = true;
+        }
+
+        // Generate smart chart based on data structure
+        function generateSmartChart(columns, rows, question) {
+            // Find the best columns for visualization
+            const numericColumns = columns.filter((col, index) => {
+                const sampleValue = rows[0] && rows[0][index];
+                return typeof sampleValue === 'number' || !isNaN(parseFloat(sampleValue));
+            });
+            
+            const categoryColumns = columns.filter((col, index) => {
+                const sampleValue = rows[0] && rows[0][index];
+                return typeof sampleValue === 'string' && isNaN(parseFloat(sampleValue));
+            });
+            
+            if (categoryColumns.length > 0 && numericColumns.length > 0) {
+                return generateActualBarChart(categoryColumns[0], numericColumns[0], columns, rows);
+            } else if (numericColumns.length >= 2) {
+                return generateActualBarChart(columns[0], numericColumns[0], columns, rows);
+            }
+            
+            return generateDataSummary(columns, rows);
+        }
+        
+        // Generate actual chart from AI suggestion
+        function generateActualChart(suggestion, columns, rows) {
+            switch(suggestion.type) {
+                case 'bar_chart':
+                    const xCol = suggestion.x_axis || columns[0];
+                    const yCol = suggestion.y_axis || columns[1];
+                    return generateActualBarChart(xCol, yCol, columns, rows, suggestion.title);
+                case 'line_chart':
+                    return generateActualLineChart(suggestion, columns, rows);
+                default:
+                    return generateActualBarChart(columns[0], columns[1], columns, rows, suggestion.title);
+            }
+        }
+        
+        // Generate actual bar chart with real data
+        function generateActualBarChart(xColumn, yColumn, columns, rows, title = null) {
+            const xIndex = columns.indexOf(xColumn);
+            const yIndex = columns.indexOf(yColumn);
+            
+            if (xIndex === -1 || yIndex === -1) {
+                return generateDataSummary(columns, rows);
+            }
+            
+            // Process data
+            const dataMap = {};
+            rows.forEach(row => {
+                const xValue = String(row[xIndex] || 'Unknown');
+                const yValue = parseFloat(row[yIndex]) || 0;
+                
+                if (dataMap[xValue]) {
+                    dataMap[xValue] += yValue;
+                } else {
+                    dataMap[xValue] = yValue;
+                }
+            });
+            
+            // Sort by value and take top 8
+            const sortedData = Object.entries(dataMap)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 8);
+            
+            const maxValue = Math.max(...sortedData.map(([,value]) => value));
+            
+            let barsHTML = '';
+            sortedData.forEach(([label, value], i) => {
+                const height = maxValue > 0 ? (value / maxValue) * 100 : 10;
+                const hue = 210 + (i * 25);
+                const color = `hsl(${hue}, 70%, 55%)`;
+                
+                barsHTML += `
+                    <div class="bar" style="height: ${height}%; background: linear-gradient(to top, ${color}, ${color}dd);">
+                        <div class="bar-value">${value.toFixed(1)}</div>
+                        <div class="bar-label">${label.length > 10 ? label.substring(0, 8) + '...' : label}</div>
+                    </div>
+                `;
+            });
+            
+            const chartTitle = title || `${xColumn} by ${yColumn}`;
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">bar_chart</span>
+                        ${chartTitle}
+                    </div>
+                    <div class="bar-chart">
+                        ${barsHTML}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate actual line chart (trend analysis)
+        function generateActualLineChart(suggestion, columns, rows) {
+            const xIndex = columns.indexOf(suggestion.x_axis);
+            const yIndex = columns.indexOf(suggestion.y_axis);
+            
+            if (xIndex === -1 || yIndex === -1) {
+                return generateDataSummary(columns, rows);
+            }
+            
+            // Calculate trend
+            const values = rows.map(row => parseFloat(row[yIndex]) || 0);
+            const firstValue = values[0] || 0;
+            const lastValue = values[values.length - 1] || 0;
+            const avgValue = values.reduce((a, b) => a + b, 0) / values.length;
+            
+            const trendDirection = lastValue > firstValue ? 'up' : lastValue < firstValue ? 'down' : 'stable';
+            const trendPercent = firstValue !== 0 ? ((lastValue - firstValue) / firstValue * 100).toFixed(1) : '0';
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">show_chart</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="trend-line">
+                        <div class="trend-indicator trend-${trendDirection}">
+                            <span class="material-icons">trending_${trendDirection === 'stable' ? 'flat' : trendDirection}</span>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">
+                                    ${trendPercent}%
+                                </div>
+                                <div style="font-size: 14px; margin-bottom: 4px;">
+                                    ${firstValue.toFixed(1)} → ${lastValue.toFixed(1)}
+                                </div>
+                                <div style="font-size: 12px; opacity: 0.7;">
+                                    Avg: ${avgValue.toFixed(1)} • ${rows.length} points
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate data summary when charts can't be created
+        function generateDataSummary(columns, rows) {
+            const numericColumns = columns.filter((col, index) => {
+                const sampleValue = rows[0] && rows[0][index];
+                return typeof sampleValue === 'number' || !isNaN(parseFloat(sampleValue));
+            });
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">analytics</span>
+                        Data Overview
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; padding: 20px;">
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: 600; color: #1a73e8;">${rows.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Records</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: 600; color: #34a853;">${columns.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Columns</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 28px; font-weight: 600; color: #ea4335;">${numericColumns.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Numeric</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateTrendChart(columns, rows) {
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">trending_up</span>
+                        Trend Analysis
+                    </div>
+                    <div class="trend-line">
+                        <div class="trend-indicator trend-up">
+                            <span class="material-icons">trending_up</span>
+                            <span>Trend visualization would show temporal changes in your data</span>
+                        </div>
+                    </div>
+                    <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                        Interactive trend chart ready for integration with Chart.js or D3.js
+                    </p>
+                </div>
+            `;
+        }
+
+        function generateRankingChart(columns, rows) {
+            // Find the best columns for ranking
+            const labelColumn = columns[0]; // First column as labels
+            const valueColumn = columns.find(col => 
+                col.toLowerCase().includes('rating') || 
+                col.toLowerCase().includes('viewers') || 
+                col.toLowerCase().includes('share') ||
+                col.toLowerCase().includes('average')
+            ) || columns[1]; // Default to second column
+            
+            const labelIndex = columns.indexOf(labelColumn);
+            const valueIndex = columns.indexOf(valueColumn);
+            
+            // Create a simple bar chart with actual data
+            const maxBars = Math.min(8, rows.length);
+            const dataPoints = rows.slice(0, maxBars).map(row => ({
+                label: String(row[labelIndex] || 'Unknown'),
+                value: parseFloat(row[valueIndex]) || 0
+            }));
+            
+            const maxValue = Math.max(...dataPoints.map(d => d.value));
+            
+            let barsHTML = '';
+            dataPoints.forEach((point, i) => {
+                const height = maxValue > 0 ? (point.value / maxValue) * 100 : 10;
+                const color = `hsl(${210 + i * 15}, 70%, 50%)`; // Different colors for each bar
+                
+                barsHTML += `
+                    <div class="bar" style="height: ${height}%; background: linear-gradient(to top, ${color}, ${color}aa);">
+                        <div class="bar-value">${point.value.toFixed(1)}</div>
+                        <div class="bar-label">${point.label.length > 15 ? point.label.substring(0, 12) + '...' : point.label}</div>
+                    </div>
+                `;
+            });
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">bar_chart</span>
+                        ${labelColumn} vs ${valueColumn}
+                    </div>
+                    <div class="bar-chart">
+                        ${barsHTML}
+                    </div>
+                    <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                        Showing top ${maxBars} entries by ${valueColumn}
+                    </p>
+                </div>
+            `;
+        }
+
+        function generateOverviewChart(columns, rows) {
+            // Generate multiple charts for overview
+            let chartsHTML = '';
+            
+            // Find numeric columns
+            const numericColumns = columns.filter((col, index) => {
+                const sampleValue = rows[0] && rows[0][index];
+                return typeof sampleValue === 'number' || !isNaN(parseFloat(sampleValue));
+            });
+            
+            if (numericColumns.length > 0) {
+                // Create a chart for the first numeric column
+                const firstNumericCol = numericColumns[0];
+                const colIndex = columns.indexOf(firstNumericCol);
+                const labelCol = columns[0]; // Use first column as labels
+                
+                const dataPoints = rows.slice(0, 6).map(row => ({
+                    label: String(row[0] || 'Unknown'),
+                    value: parseFloat(row[colIndex]) || 0
+                }));
+                
+                const maxValue = Math.max(...dataPoints.map(d => d.value));
+                
+                let barsHTML = '';
+                dataPoints.forEach((point, i) => {
+                    const height = maxValue > 0 ? (point.value / maxValue) * 100 : 10;
+                    
+                    barsHTML += `
+                        <div class="bar" style="height: ${height}%;">
+                            <div class="bar-value">${point.value.toFixed(1)}</div>
+                            <div class="bar-label">${point.label.length > 10 ? point.label.substring(0, 8) + '...' : point.label}</div>
+                        </div>
+                    `;
+                });
+                
+                chartsHTML += `
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <span class="material-icons">insights</span>
+                            ${labelCol} by ${firstNumericCol}
+                        </div>
+                        <div class="bar-chart">
+                            ${barsHTML}
+                        </div>
+                        <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                            Overview of ${rows.length} records
+                        </p>
+                    </div>
+                `;
+            }
+            
+            // Add data summary table
+            chartsHTML += `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">table_view</span>
+                        Data Summary
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; padding: 16px;">
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: 500; color: #1a73e8;">${rows.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Total Records</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: 500; color: #34a853;">${columns.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Data Columns</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 24px; font-weight: 500; color: #ea4335;">${numericColumns.length}</div>
+                            <div style="font-size: 12px; color: #5f6368;">Numeric Fields</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 16px; padding: 12px; background: rgba(26, 115, 232, 0.1); border-radius: 6px;">
+                        <strong>Columns:</strong> ${columns.join(', ')}
+                    </div>
+                </div>
+            `;
+            
+            return chartsHTML;
+        }
+
+        function generateTrendChart(columns, rows) {
+            // Look for date/time columns and numeric columns
+            const dateColumns = columns.filter(col => 
+                col.toLowerCase().includes('date') || 
+                col.toLowerCase().includes('time') || 
+                col.toLowerCase().includes('week')
+            );
+            
+            const numericColumns = columns.filter((col, index) => {
+                const sampleValue = rows[0] && rows[0][index];
+                return typeof sampleValue === 'number' || !isNaN(parseFloat(sampleValue));
+            });
+            
+            if (dateColumns.length > 0 && numericColumns.length > 0) {
+                const dateCol = dateColumns[0];
+                const valueCol = numericColumns[0];
+                const dateIndex = columns.indexOf(dateCol);
+                const valueIndex = columns.indexOf(valueCol);
+                
+                // Calculate trend direction
+                const firstValue = parseFloat(rows[0][valueIndex]) || 0;
+                const lastValue = parseFloat(rows[rows.length - 1][valueIndex]) || 0;
+                const trendDirection = lastValue > firstValue ? 'up' : lastValue < firstValue ? 'down' : 'stable';
+                const trendPercent = firstValue !== 0 ? ((lastValue - firstValue) / firstValue * 100).toFixed(1) : '0';
+                
+                return `
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <span class="material-icons">trending_${trendDirection === 'stable' ? 'flat' : trendDirection}</span>
+                            ${valueCol} Trend Over ${dateCol}
+                        </div>
+                        <div class="trend-line">
+                            <div class="trend-indicator trend-${trendDirection}">
+                                <span class="material-icons">trending_${trendDirection === 'stable' ? 'flat' : trendDirection}</span>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 18px; font-weight: 500;">
+                                        ${trendPercent}% ${trendDirection === 'up' ? 'increase' : trendDirection === 'down' ? 'decrease' : 'stable'}
+                                    </div>
+                                    <div style="font-size: 12px; margin-top: 4px;">
+                                        From ${firstValue.toFixed(1)} to ${lastValue.toFixed(1)}
+                                    </div>
+                                    <div style="font-size: 10px; margin-top: 4px; opacity: 0.7;">
+                                        Across ${rows.length} time periods
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return this.generateOverviewChart(columns, rows);
+        }
+
+        function generateComparisonChart(columns, rows) {
+            // Look for network or category columns
+            const categoryCol = columns.find(col => 
+                col.toLowerCase().includes('network') || 
+                col.toLowerCase().includes('category') || 
+                col.toLowerCase().includes('show')
+            ) || columns[0];
+            
+            const valueCol = columns.find(col => 
+                col.toLowerCase().includes('rating') || 
+                col.toLowerCase().includes('average') || 
+                col.toLowerCase().includes('viewers')
+            ) || columns[1];
+            
+            const categoryIndex = columns.indexOf(categoryCol);
+            const valueIndex = columns.indexOf(valueCol);
+            
+            // Group by category and calculate averages
+            const categoryData = {};
+            rows.forEach(row => {
+                const category = String(row[categoryIndex] || 'Unknown');
+                const value = parseFloat(row[valueIndex]) || 0;
+                
+                if (!categoryData[category]) {
+                    categoryData[category] = { total: 0, count: 0, values: [] };
+                }
+                categoryData[category].total += value;
+                categoryData[category].count += 1;
+                categoryData[category].values.push(value);
+            });
+            
+            // Calculate averages and create chart
+            const comparisonData = Object.entries(categoryData).map(([category, data]) => ({
+                category,
+                average: data.total / data.count,
+                count: data.count
+            })).sort((a, b) => b.average - a.average);
+            
+            const maxValue = Math.max(...comparisonData.map(d => d.average));
+            
+            let barsHTML = '';
+            comparisonData.forEach((item, i) => {
+                const height = (item.average / maxValue) * 100;
+                const color = i === 0 ? '#34a853' : i === 1 ? '#fbbc04' : '#ea4335';
+                
+                barsHTML += `
+                    <div class="bar" style="height: ${height}%; background: linear-gradient(to top, ${color}, ${color}aa);">
+                        <div class="bar-value">${item.average.toFixed(2)}</div>
+                        <div class="bar-label">${item.category}</div>
+                    </div>
+                `;
+            });
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">compare_arrows</span>
+                        ${categoryCol} Comparison by ${valueCol}
+                    </div>
+                    <div class="bar-chart">
+                        ${barsHTML}
+                    </div>
+                    <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                        Average ${valueCol} by ${categoryCol}
+                    </p>
+                </div>
+            `;
+        }
+
+        function refreshCharts() {
+            if (lastQueryData && currentQuestion) {
+                generateChartsAutomatically(currentQuestion, lastQueryData);
+            }
+        }
+
+        function generateDataTable(data) {
+            if (!data.columns || !data.rows) return '';
+            
+            let table = `<div class="response-content">
+                <h3 style="margin-bottom: 16px; font-size: 16px; font-weight: 500; color: #202124;">Query Results</h3>
+                <table class="data-table">
+                    <thead><tr>`;
+            
+            data.columns.forEach(col => {
+                table += `<th>${col}</th>`;
+            });
+            
+            table += `</tr></thead><tbody>`;
+            
+            data.rows.forEach(row => {
+                table += `<tr>`;
+                row.forEach(cell => {
+                    table += `<td>${cell !== null ? cell : ''}</td>`;
+                });
+                table += `</tr>`;
+            });
+            
+            table += `</tbody></table></div>`;
+            return table;
+        }
+
+        function displayError(errorMessage) {
+            const resultsContent = document.getElementById('resultsContent');
+            const metadata = document.getElementById('resultsMetadata');
+            
+            metadata.innerHTML = `<span>Error occurred at ${new Date().toLocaleString()}</span>`;
+            
+            resultsContent.innerHTML = `
+                <div class="error-state">
+                    <span class="material-icons">error</span>
+                    <span>${errorMessage}</span>
+                </div>
+                <div class="empty-state">
+                    <span class="material-icons">psychology</span>
+                    <h3>Ready to try again</h3>
+                    <p>Please check your query and try again, or select an example question to get started.</p>
+                </div>
+            `;
+        }
+
+        function clearResults() {
+            if (isProcessing) return;
+            
+            const resultsContent = document.getElementById('resultsContent');
+            const metadata = document.getElementById('resultsMetadata');
+            
+            resultsContent.innerHTML = `
+                <div class="empty-state">
+                    <span class="material-icons">psychology</span>
+                    <h3>Ready to analyze your data</h3>
+                    <p>Ask a question about your TV ratings data using natural language, or execute a custom SQL query to get started.</p>
+                </div>
+            `;
+            
+            metadata.innerHTML = '';
+            document.getElementById('questionInput').value = '';
+            document.getElementById('sqlInput').value = '';
+            updateStatus('ready', 'Ready');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to submit
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (document.activeElement === document.getElementById('questionInput')) {
+                    submitQuestion();
+                } else if (document.activeElement === document.getElementById('sqlInput')) {
+                    executeSql();
+                }
+            }
+            
+            // Escape to cancel
+            if (e.key === 'Escape' && isProcessing) {
+                cancelRequest();
+            }
+            
+            // Ctrl/Cmd + K to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('questionInput').focus();
+            }
+        });
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        });
+
+        // Prevent form submission on Enter (except with Ctrl/Cmd)
+        document.getElementById('questionInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('sqlInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        });
+
+        // Auto-save draft functionality (optional enhancement)
+        let draftTimeout;
+        document.getElementById('questionInput').addEventListener('input', function(e) {
+            clearTimeout(draftTimeout);
+            draftTimeout = setTimeout(() => {
+                localStorage.setItem('tv-analytics-draft', e.target.value);
+            }, 1000);
+        });
+
+        // Load draft on page load
+        window.addEventListener('load', function() {
+            const draft = localStorage.getItem('tv-analytics-draft');
+            if (draft && draft.trim()) {
+                document.getElementById('questionInput').value = draft;
+                autoResizeTextarea({target: document.getElementById('questionInput')});
+            }
+        });
+
+        // Clear draft when question is submitted
+        function clearDraft() {
+            localStorage.removeItem('tv-analytics-draft');
+        }
+
+        // Update the submitQuestion function to clear draft
+        const originalSubmitQuestion = submitQuestion;
+        submitQuestion = async function() {
+            clearDraft();
+            return originalSubmitQuestion();
+        };
+
+        // Handle navigation tabs (for future enhancement)
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                if (isProcessing) return;
+                
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Future: Switch between different views/sections
+                const tabText = this.textContent;
+                console.log(`Switched to ${tabText} tab`);
+            });
+        });
+
+        // Performance monitoring (optional)
+        let startTime;
+        function startPerformanceMonitoring() {
+            startTime = performance.now();
+        }
+
+        function endPerformanceMonitoring(operation) {
+            if (startTime) {
+                const duration = Math.round(performance.now() - startTime);
+                console.log(`${operation} completed in ${duration}ms`);
+                startTime = null;
+            }
+        }
+
+        // Add performance monitoring to requests
+        const originalFetch = window.fetch;
+        window.fetch = function(...args) {
+            startPerformanceMonitoring();
+            return originalFetch.apply(this, args).finally(() => {
+                endPerformanceMonitoring('API Request');
+            });
+        };
+
+        // Error boundary for JavaScript errors
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', e.error);
+            updateStatus('error', 'Application error');
+            
+            // Show user-friendly error message
+            if (isProcessing) {
+                displayError('An unexpected error occurred. Please try again.');
+                setProcessingState(false);
+            }
+        });
+
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled Promise Rejection:', e.reason);
+            updateStatus('error', 'Application error');
+            
+            if (isProcessing) {
+                displayError('An unexpected error occurred. Please try again.');
+                setProcessingState(false);
+            }
+        });
+
+        // Service worker registration (for future PWA features)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Future: Register service worker for offline functionality
+                console.log('Service Worker support detected');
+            });
+        }
+
+
+        
+        // Generate chart from AI suggestion
+        function generateChartFromSuggestion(suggestion, columns, rows) {
+            const icon = getChartIcon(suggestion.type);
+            
+            switch(suggestion.type) {
+                case 'bar_chart':
+                    return generateBarChartFromSuggestion(suggestion, columns, rows, icon);
+                case 'line_chart':
+                    return generateLineChartFromSuggestion(suggestion, columns, rows, icon);
+                case 'pie_chart':
+                    return generatePieChartFromSuggestion(suggestion, columns, rows, icon);
+                case 'scatter_plot':
+                    return generateScatterPlotFromSuggestion(suggestion, columns, rows, icon);
+                default:
+                    return generateGenericChartFromSuggestion(suggestion, columns, rows, icon);
+            }
+        }
+        
+        // Helper function to get appropriate icon for chart type
+        function getChartIcon(chartType) {
+            const iconMap = {
+                'bar_chart': 'bar_chart',
+                'line_chart': 'show_chart',
+                'pie_chart': 'pie_chart',
+                'scatter_plot': 'scatter_plot',
+                'trend': 'trending_up',
+                'ranking': 'leaderboard'
+            };
+            return iconMap[chartType] || 'insert_chart';
+        }
+        
+        // Generate bar chart from suggestion
+        function generateBarChartFromSuggestion(suggestion, columns, rows, icon) {
+            const xIndex = columns.indexOf(suggestion.x_axis);
+            const yIndex = columns.indexOf(suggestion.y_axis);
+            
+            if (xIndex === -1 || yIndex === -1) {
+                return generateGenericChartFromSuggestion(suggestion, columns, rows, icon);
+            }
+            
+            const maxBars = Math.min(10, rows.length);
+            const dataPoints = rows.slice(0, maxBars).map(row => ({
+                label: String(row[xIndex] || 'Unknown'),
+                value: parseFloat(row[yIndex]) || 0
+            }));
+            
+            // Sort by value for better visualization
+            dataPoints.sort((a, b) => b.value - a.value);
+            
+            const maxValue = Math.max(...dataPoints.map(d => d.value));
+            
+            let barsHTML = '';
+            dataPoints.forEach((point, i) => {
+                const height = maxValue > 0 ? (point.value / maxValue) * 100 : 10;
+                const color = `hsl(${210 + i * 20}, 70%, 50%)`;
+                
+                barsHTML += `
+                    <div class="bar" style="height: ${height}%; background: linear-gradient(to top, ${color}, ${color}aa);">
+                        <div class="bar-value">${point.value.toFixed(1)}</div>
+                        <div class="bar-label">${point.label.length > 12 ? point.label.substring(0, 10) + '...' : point.label}</div>
+                    </div>
+                `;
+            });
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">${icon}</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="bar-chart">
+                        ${barsHTML}
+                    </div>
+                    <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                        ${suggestion.description} • Showing top ${maxBars} entries
+                    </p>
+                </div>
+            `;
+        }
+        
+        // Generate line chart from suggestion (simplified representation)
+        function generateLineChartFromSuggestion(suggestion, columns, rows, icon) {
+            const xIndex = columns.indexOf(suggestion.x_axis);
+            const yIndex = columns.indexOf(suggestion.y_axis);
+            
+            if (xIndex === -1 || yIndex === -1) {
+                return generateGenericChartFromSuggestion(suggestion, columns, rows, icon);
+            }
+            
+            // Calculate trend
+            const firstValue = parseFloat(rows[0][yIndex]) || 0;
+            const lastValue = parseFloat(rows[rows.length - 1][yIndex]) || 0;
+            const trendDirection = lastValue > firstValue ? 'up' : lastValue < firstValue ? 'down' : 'stable';
+            const trendPercent = firstValue !== 0 ? ((lastValue - firstValue) / firstValue * 100).toFixed(1) : '0';
+            
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">${icon}</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="trend-line">
+                        <div class="trend-indicator trend-${trendDirection}">
+                            <span class="material-icons">trending_${trendDirection === 'stable' ? 'flat' : trendDirection}</span>
+                            <div style="text-align: center;">
+                                <div style="font-size: 18px; font-weight: 500;">
+                                    ${trendPercent}% ${trendDirection === 'up' ? 'increase' : trendDirection === 'down' ? 'decrease' : 'stable'}
+                                </div>
+                                <div style="font-size: 12px; margin-top: 4px;">
+                                    From ${firstValue.toFixed(1)} to ${lastValue.toFixed(1)}
+                                </div>
+                                <div style="font-size: 10px; margin-top: 4px; opacity: 0.7;">
+                                    Across ${rows.length} data points
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color: #5f6368; font-size: 12px; text-align: center;">
+                        ${suggestion.description}
+                    </p>
+                </div>
+            `;
+        }
+        
+        // Generate generic chart from suggestion
+        function generateGenericChartFromSuggestion(suggestion, columns, rows, icon) {
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">${icon}</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="chart-placeholder">
+                        <span class="material-icons">${icon}</span>
+                        <div style="text-align: center; margin-top: 12px;">
+                            <div style="font-weight: 500; margin-bottom: 8px;">${suggestion.title}</div>
+                            <div style="font-size: 12px; opacity: 0.8;">${suggestion.description}</div>
+                            <div style="font-size: 11px; margin-top: 8px; opacity: 0.6;">
+                                Ready for integration with Chart.js or D3.js
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate pie chart from suggestion (simplified representation)
+        function generatePieChartFromSuggestion(suggestion, columns, rows, icon) {
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">${icon}</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="chart-placeholder">
+                        <span class="material-icons" style="font-size: 64px; color: #1a73e8;">${icon}</span>
+                        <div style="text-align: center; margin-top: 12px;">
+                            <div style="font-weight: 500; margin-bottom: 8px;">Distribution Analysis</div>
+                            <div style="font-size: 12px; opacity: 0.8;">${suggestion.description}</div>
+                            <div style="font-size: 11px; margin-top: 8px; opacity: 0.6;">
+                                ${rows.length} data points ready for pie chart visualization
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate scatter plot from suggestion (simplified representation)
+        function generateScatterPlotFromSuggestion(suggestion, columns, rows, icon) {
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">
+                        <span class="material-icons">${icon}</span>
+                        ${suggestion.title}
+                    </div>
+                    <div class="chart-placeholder">
+                        <span class="material-icons" style="font-size: 64px; color: #34a853;">${icon}</span>
+                        <div style="text-align: center; margin-top: 12px;">
+                            <div style="font-weight: 500; margin-bottom: 8px;">Correlation Analysis</div>
+                            <div style="font-size: 12px; opacity: 0.8;">${suggestion.description}</div>
+                            <div style="font-size: 11px; margin-top: 8px; opacity: 0.6;">
+                                X: ${suggestion.x_axis} • Y: ${suggestion.y_axis}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Generate specific chart when user clicks on suggestion
+        function generateSpecificChart(chartType, title) {
+            if (!lastQueryData) {
+                console.log('No data available for chart generation');
+                return;
+            }
+            
+            // Switch to charts tab and generate the specific chart
+            switchTab('charts');
+            
+            // Find the suggestion and generate it
+            const suggestion = {
+                type: chartType,
+                title: title,
+                description: `User-requested ${chartType.replace('_', ' ')}`
+            };
+            
+            const columns = lastQueryData.columns;
+            const rows = lastQueryData.rows;
+            
+            if (columns && rows) {
+                const chartHTML = generateChartFromSuggestion(suggestion, columns, rows);
+                const chartsContent = document.getElementById('chartsContent');
+                chartsContent.innerHTML = chartHTML;
+            }
+        }
+
+        // Add mobile hamburger menu for responsive design
+        if (window.innerWidth <= 768) {
+            const navLeft = document.querySelector('.nav-left');
+            const hamburger = document.createElement('button');
+            hamburger.innerHTML = '<span class="material-icons">menu</span>';
+            hamburger.className = 'btn';
+            hamburger.style.cssText = 'min-width: 40px; padding: 8px; margin-right: 12px;';
+            hamburger.onclick = toggleSidebar;
+            navLeft.insertBefore(hamburger, navLeft.firstChild);
+        }
+    </script>
+</body>
+</html>
