@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import re
 
 # Load environment variables from .env file
-load_dotenv(override=True)
+load_dotenv()
 
 
 app = Flask(__name__)
@@ -219,6 +219,10 @@ def get_sample_questions():
         "What are the viewership trends by network over time?"
     ]
     return jsonify({'questions': questions})
+
+# This is required for Vercel
+def application(environ, start_response):
+    return app(environ, start_response)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
