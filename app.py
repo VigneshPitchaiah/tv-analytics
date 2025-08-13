@@ -7,7 +7,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(override=True)
 
 app = Flask(__name__)
 CORS(app)
@@ -82,9 +82,9 @@ def get_available_tables():
         print(f"Error getting available tables: {e}")
         return []
     finally:
-        if 'cursor' in locals():
+        if 'cursor' in locals() and cursor:
             cursor.close()
-        if 'conn' in locals():
+        if 'conn' in locals() and conn:
             conn.close()
 
 def get_table_schema(table_name=None):
